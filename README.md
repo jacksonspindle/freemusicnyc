@@ -54,8 +54,21 @@ freemusicnyc/
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- **Node.js v20.19+ or v22.12+** (required for Vite 7)
 - npm or yarn
+
+**Check your Node version:**
+```bash
+node --version
+```
+
+**If you need to upgrade Node.js:**
+- Using nvm (recommended):
+  ```bash
+  nvm install 22.12.0
+  nvm use 22.12.0
+  ```
+- Or download from [nodejs.org](https://nodejs.org/)
 
 ### Installation
 
