@@ -29,11 +29,13 @@ async function refreshEvents() {
 // Initial scrape
 refreshEvents();
 
-// Schedule automatic refresh every 6 hours
-cron.schedule('0 */6 * * *', () => {
-  console.log('Running scheduled event refresh...');
-  refreshEvents();
-});
+// Schedule automatic refresh every 6 hours (only in non-serverless environment)
+if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_CRON === 'true') {
+  cron.schedule('0 */6 * * *', () => {
+    console.log('Running scheduled event refresh...');
+    refreshEvents();
+  });
+}
 
 // Routes
 
@@ -138,17 +140,22 @@ app.get('/api/health', (req: Request, res: Response) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`\n🎵 Free Music NYC API Server`);
-  console.log(`📍 Server running on http://localhost:${PORT}`);
-  console.log(`🎸 Events cached: ${cachedEvents.length}`);
-  console.log(`\nAvailable endpoints:`);
-  console.log(`  GET  /api/events - Get all events (with optional filters)`);
-  console.log(`  GET  /api/events/today - Get today's events`);
-  console.log(`  GET  /api/events/free - Get free events only`);
-  console.log(`  GET  /api/neighborhoods - Get list of neighborhoods`);
-  console.log(`  GET  /api/genres - Get list of genres`);
-  console.log(`  POST /api/refresh - Manually refresh events`);
-  console.log(`  GET  /api/health - Health check\n`);
-});
+// Start server (only in non-serverless environment)
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`\n🎵 Free Music NYC API Server`);
+    console.log(`📍 Server running on http://localhost:${PORT}`);
+    console.log(`🎸 Events cached: ${cachedEvents.length}`);
+    console.log(`\nAvailable endpoints:`);
+    console.log(`  GET  /api/events - Get all events (with optional filters)`);
+    console.log(`  GET  /api/events/today - Get today's events`);
+    console.log(`  GET  /api/events/free - Get free events only`);
+    console.log(`  GET  /api/neighborhoods - Get list of neighborhoods`);
+    console.log(`  GET  /api/genres - Get list of genres`);
+    console.log(`  POST /api/refresh - Manually refresh events`);
+    console.log(`  GET  /api/health - Health check\n`);
+  });
+}
+
+// Export for Vercel serverless
+export default app;
